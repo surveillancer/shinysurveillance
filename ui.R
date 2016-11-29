@@ -8,7 +8,7 @@ ears_parameters <- function() {
                  max = 1 - .Machine$double.eps,
                  0.001),
     selectInput("ears_method",
-                label = "Ears Method",
+                label = "EARS Method",
                 choices = c("C1", "C2", "C3"),
                 multiple = FALSE,
                 selected = "C1")
