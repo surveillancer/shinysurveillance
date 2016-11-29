@@ -1,4 +1,3 @@
-
 library(shiny)
 library(surveillance)
 library(ggplot2)
@@ -6,6 +5,8 @@ library(plotly)
 library(dplyr)
 library(purrr)
 library(viridis)
+
+source("global.R")
 
 sts_to_df <- function(algorithm, sts) {
   data.frame(
@@ -101,7 +102,7 @@ shinyServer(function(input, output) {
     purrr::map(input$algorithms, function(algo) {
       base_data %>% left_join(sts_to_df(algo, algorithms[[algo]]),
                               by = c("epoch", "observed")) %>%
-        mutate(algorithm = algo)
+        mutate(algorithm = algorithm_name_dict[algo])
     }) %>% bind_rows
   })
 

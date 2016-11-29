@@ -1,5 +1,8 @@
 
 library(shiny)
+
+source("global.R")
+
 ears_parameters <- function() {
   tagList(
     numericInput("ears_alpha",
@@ -119,9 +122,7 @@ shinyUI(fluidPage(
         tabPanel("Algorithms",
                  selectInput("algorithms", label = "Select algorithms",
                              selected = c("ears", "farringtonflexible", "glrnb"),
-                             choices = c("EARSC" = "ears",
-                                         "Farrington Flexible" = "farringtonflexible",
-                                         "Negative Binomial CUSUM" = "glrnb"),
+                             choices = algorithm_choices,
                              multiple = TRUE),
                  numericInput("range_min", "Monitor last X weeks:", max = 52 * 4,
                               min = 2, value = 100)
