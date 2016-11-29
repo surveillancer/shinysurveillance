@@ -1,6 +1,5 @@
 
 library(shiny)
-
 ears_parameters <- function() {
   tagList(
     numericInput("ears_alpha",
@@ -61,7 +60,7 @@ glrnb_parameters <- function() {
     numericInput("glrnb_c_ARL",
                  "Threshold in the GLR test, i.e. c_gamma:",
                  min = 0, value = 5),
-    checkboxInput("glrnb_trend", "Include trend:", value = TRUE)
+    checkboxInput("glrnb_trend", "Include trend", value = TRUE)
   )
 }
 
@@ -112,7 +111,7 @@ dataset_choices <- function() {
 }
 
 shinyUI(fluidPage(
-
+  includeHTML("github.html"),
   titlePanel("Surveillance Algorithm Assistant"),
   tags$small("Test surveillance algorithms and tune the parameters."),
     fluidRow(
@@ -120,7 +119,7 @@ shinyUI(fluidPage(
         tabPanel("Algorithms",
                  selectInput("algorithms", label = "Algorithm",
                              selected = c("ears", "farringtonflexible"),
-                             choices = c("Ears" = "ears",
+                             choices = c("EARSC" = "ears",
                                          "Farrington Flexible" = "farringtonflexible",
                                          "Negative Binomial CUSUM" = "glrnb"),
                              multiple = TRUE),
@@ -128,7 +127,7 @@ shinyUI(fluidPage(
                               min = 2, value = 100)
 
         ),
-        tabPanel("Ears", ears_parameters()),
+        tabPanel("EARSC", ears_parameters()),
         tabPanel("Farrington Flexible", farringtonFlexible_parameters()),
         tabPanel("Negative Binomial CUSUM", glrnb_parameters())
       )),
@@ -136,6 +135,8 @@ shinyUI(fluidPage(
                             choices = dataset_choices()))
     ),
     hr(),
-    plotly::plotlyOutput("mainPlot")
+    plotly::plotlyOutput("mainPlot"),
+    hr(),
+    textOutput("errors")
   )
 )

@@ -5,6 +5,7 @@ library(ggplot2)
 library(plotly)
 library(dplyr)
 library(purrr)
+library(viridis)
 
 sts_to_df <- function(algorithm, sts) {
   data.frame(
@@ -20,40 +21,66 @@ sts_to_df <- function(algorithm, sts) {
 shinyServer(function(input, output) {
 
   algo_range <- reactive({
-    pmax(0, nrow(time_series()) - as.numeric(input$range_min)):nrow(time_series())
+    min_range <- pmax(0, nrow(time_series()) - as.numeric(input$range_min))
+    min_range:nrow(time_series())
   })
 
   algorithms <- reactiveValues()
+  log <- reactiveValues()
 
+  output$errors <- renderText({
+    if (!is.null(log[["error"]])) {
+      log[["error"]]
+    }
+  })
 
   # ears
   observe({
-    algorithms[["ears"]] <- surveillance::earsC(time_series(), control = list(alpha = input$ears_alpha,
+    result <- purrr::safely(~surveillance::earsC(time_series(), control = list(alpha = input$ears_alpha,
                                                       method = input$ears_method,
-                                                      range = algo_range()))
+                                                      range = algo_range())))()
+    if (!is.null(result$result)) {
+      algorithms[["ears"]] <- result$result
+    } else {
+      algorithms[["ears"]] <- time_series()[1, ]
+      log[["error"]] <- result$error$message
+      log[["error"]] <- paste("EARSC:", result$error$message)
+    }
   })
 
   # farringtonflexible
   observe({
-    algorithms[["farringtonflexible"]] <- surveillance::farringtonFlexible(time_series(), control = list(
+    result <- purrr::safely(~surveillance::farringtonFlexible(time_series(), control = list(
       alpha = input$farringtonflexible_alpha,
       b = input$farringtonflexible_b,
       w = input$farringtonflexible_w,
       pastWeeksNotIncluded = input$farringtonflexible_pastWeeksNotIncluded,
       powertrans = input$farringtonflexible_powertrans,
       range = algo_range()
-    ))
+    )))()
+    if (!is.null(result$result)) {
+      algorithms[["farringtonflexible"]] <- result$result
+    } else {
+      algorithms[["farringtonflexible"]] <- time_series()[1, ]
+      log[["error"]] <- paste("farringtonflexible:", result$error$message)
+    }
   })
 
   # glrnb
   observe({
-    algorithms[["glrnb"]] <- surveillance::glrnb(time_series(), control = list(
+    result <- purrr::safely(~surveillance::glrnb(time_series(), control = list(
       "c.ARL" = input$glrnb_c_ARL,
       ret = "cases",
       theta = 1.2,
       mu0 = list(S = 1, trend = input$glrnb_trend),
       range = algo_range()
-    ))
+    )))()
+    if (!is.null(result$result)) {
+      algorithms[["glrnb"]] <- result$result
+    } else {
+      algorithms[["glrnb"]] <- time_series()[1, ]
+      log[["error"]] <- paste("glrnb:", result$error$message)
+    }
   })
 
   # data
@@ -84,11 +111,12 @@ shinyServer(function(input, output) {
       filter(alarm)
     outbreak_data <- plot_data %>%
       filter(state == TRUE)
-    saveRDS(plot_data, file = "plot_data.rds")
     plotly::ggplotly(ggplot(plot_data, aes(x = epoch, y = observed)) +
-      geom_bar(stat = "identity") +
-      geom_line(aes(y = upperbound), color = "lightblue", linetype = "dotted") +
+      geom_bar(stat = "identity", color = "#123456") +
+      geom_line(aes(y = upperbound), color = "orange") +
         facet_wrap(~ algorithm) +
+        xlab("ISO week") +
+        ylab("# cases") +
         #geom_point(data = outbreak_data, na.rm = TRUE, y = 0, color = "black", shape = "cross") +
         geom_point(data = alarm_data, color = "red", na.rm = TRUE, y = 0)
     )
