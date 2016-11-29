@@ -96,7 +96,7 @@ dataset_choices <- function() {
     #"Danish 1994-2008 all cause mortality data for six age groups" = "momo",
     "n1 'Norovirus' in 'Stadtkreis Berlin Mitte' (Germany, Berlin)" = "n1",
     "n2 'Norovirus' in 'Torgau-Oschatz' (Germany, Sachsen)" = "n2",
-    "q1.nrwh 'Q-Fieber' in the 'Hochsauerlandkreis' (Germany, Westfalen) and in the 'Landkreis Waldeck-Frankenberg' (Germany, Hessen)" = "q1_nrwh",
+    "q1.nrwh 'Q-Fever' in the 'Hochsauerlandkreis' (Germany, Westfalen) and in the 'Landkreis Waldeck-Frankenberg' (Germany, Hessen)" = "q1_nrwh",
     "q2 'Q-Fieber' in 'München' (Germany, Bayern)" = "q2",
     #"Rotavirus cases in Brandenburg, Germany, during 2002-2013 stratified by 5 age categories" = "rotaBB",
     "s1 'Salmonella Oranienburg' in Germany" = "s1",
@@ -113,8 +113,8 @@ dataset_choices <- function() {
 
 shinyUI(fluidPage(
 
-  titlePanel("Surveillance Algorithm Tuner"),
-  tags$small("Test surveillance algorithms and tune the paramters."),
+  titlePanel("Surveillance Algorithm Assistant"),
+  tags$small("Test surveillance algorithms and tune the parameters."),
     fluidRow(
       column(8, tabsetPanel(
         tabPanel("Algorithms",
