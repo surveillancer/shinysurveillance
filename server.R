@@ -72,8 +72,8 @@ shinyServer(function(input, output) {
     result <- purrr::safely(~surveillance::glrnb(time_series(), control = list(
       "c.ARL" = input$glrnb_c_ARL,
       ret = "cases",
-      theta = 1.2,
-      mu0 = list(S = 1, trend = input$glrnb_trend),
+      theta = 1 + input$glrnb_theta / 100,
+      mu0 = list(S = input$glrnb_S, trend = input$glrnb_trend),
       range = algo_range()
     )))()
     if (!is.null(result$result)) {

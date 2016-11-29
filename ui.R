@@ -60,10 +60,20 @@ farringtonFlexible_parameters <- function() {
 
 glrnb_parameters <- function() {
   tagList(
-    numericInput("glrnb_c_ARL",
-                 "Threshold in the GLR test, i.e. c_gamma:",
-                 min = 0, value = 5),
-    checkboxInput("glrnb_trend", "Include trend", value = TRUE)
+    shiny::fluidRow(
+      column(6,
+        numericInput("glrnb_c_ARL",
+                     "Threshold in the GLR test, i.e. c_gamma:",
+                     min = 0, value = 5),
+        numericInput("glrnb_S",
+                     "Number of harmonics to include:",
+                     min = 0, max = 4, value = 1),
+        checkboxInput("glrnb_trend", "Include trend", value = TRUE)
+      ),
+      column(6, numericInput("glrnb_theta",
+                              "Detect an increase in cases of X percent (default 20%):",
+                              min = 1, value = 20))
+    )
   )
 }
 
@@ -125,7 +135,7 @@ shinyUI(fluidPage(
                              choices = algorithm_choices,
                              multiple = TRUE),
                  numericInput("range_min", "Monitor last X weeks:", max = 52 * 4,
-                              min = 2, value = 100)
+                              min = 2, value = 70)
 
         ),
         tabPanel("EARSC", ears_parameters()),
