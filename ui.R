@@ -117,8 +117,8 @@ shinyUI(fluidPage(
     fluidRow(
       column(8, tabsetPanel(
         tabPanel("Algorithms",
-                 selectInput("algorithms", label = "Algorithm",
-                             selected = c("ears", "farringtonflexible"),
+                 selectInput("algorithms", label = "Select algorithms",
+                             selected = c("ears", "farringtonflexible", "glrnb"),
                              choices = c("EARSC" = "ears",
                                          "Farrington Flexible" = "farringtonflexible",
                                          "Negative Binomial CUSUM" = "glrnb"),
@@ -129,13 +129,15 @@ shinyUI(fluidPage(
         ),
         tabPanel("EARSC", ears_parameters()),
         tabPanel("Farrington Flexible", farringtonFlexible_parameters()),
-        tabPanel("Negative Binomial CUSUM", glrnb_parameters())
-      )),
-      column(4, selectInput("dataset", "Dataset:", selected = "salmAllOnset",
-                            choices = dataset_choices()))
+        tabPanel("Negative Binomial CUSUM", glrnb_parameters()),
+        tabPanel("Dataset", selectInput("dataset", "Dataset:", selected = "salmAllOnset",
+                                        choices = dataset_choices()))
+      ))
     ),
     hr(),
+    actionButton("update_algos", "Update charts", class = "btn-success"),
     plotly::plotlyOutput("mainPlot"),
+    p("For each algorithm a seperate chart is shown. Bars show the number of cases per EPI (ISO) week. Red dots indicate an alarm flagged by the respective algorithm. Orange lines represent the upper bounds of the respective algorithm for each week."),
     hr(),
     textOutput("errors")
   )

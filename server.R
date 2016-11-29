@@ -35,7 +35,7 @@ shinyServer(function(input, output) {
   })
 
   # ears
-  observe({
+  observeEvent({input$update_algos; time_series()}, {
     result <- purrr::safely(~surveillance::earsC(time_series(), control = list(alpha = input$ears_alpha,
                                                       method = input$ears_method,
                                                       range = algo_range())))()
@@ -49,7 +49,7 @@ shinyServer(function(input, output) {
   })
 
   # farringtonflexible
-  observe({
+  observeEvent({input$update_algos; time_series()}, {
     result <- purrr::safely(~surveillance::farringtonFlexible(time_series(), control = list(
       alpha = input$farringtonflexible_alpha,
       b = input$farringtonflexible_b,
@@ -67,7 +67,7 @@ shinyServer(function(input, output) {
   })
 
   # glrnb
-  observe({
+  observeEvent({input$update_algos; time_series()}, {
     result <- purrr::safely(~surveillance::glrnb(time_series(), control = list(
       "c.ARL" = input$glrnb_c_ARL,
       ret = "cases",
