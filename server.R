@@ -20,32 +20,41 @@ sts_to_df <- function(algorithm, sts) {
 shinyServer(function(input, output) {
 
   algo_range <- reactive({
-    (nrow(time_series()) - as.numeric(input$range_min)):nrow(time_series())
+    pmax(0, nrow(time_series()) - as.numeric(input$range_min)):nrow(time_series())
   })
 
-  algorithms <- list(
-    "ears" = function(sts) {
-      surveillance::earsC(time_series(), control = list(alpha = input$ears_alpha,
-                                                        method = input$ears_method,
-                                                        range = algo_range()))
-    },
-    "farringtonflexible" = function(sts) {
-      surveillance::farringtonFlexible(time_series(), control = list(
-        alpha = input$farringtonflexible_alpha,
-        b = input$farringtonflexible_b,
-        w = input$farringtonflexible_w,
-        range = algo_range()
-      ))
-    },
-    "glrnb" = function(sts) {
-      surveillance::glrnb(time_series(), control = list(
-        "c.ARL" = input$glrnb_c_ARL,
-        ret = "cases",
-        theta = 1.2,
-        range = algo_range()
-      ))
-    }
-  )
+  algorithms <- reactiveValues()
+
+
+  # ears
+  observe({
+    algorithms[["ears"]] <- surveillance::earsC(time_series(), control = list(alpha = input$ears_alpha,
+                                                      method = input$ears_method,
+                                                      range = algo_range()))
+  })
+
+  # farringtonflexible
+  observe({
+    algorithms[["farringtonflexible"]] <- surveillance::farringtonFlexible(time_series(), control = list(
+      alpha = input$farringtonflexible_alpha,
+      b = input$farringtonflexible_b,
+      w = input$farringtonflexible_w,
+      pastWeeksNotIncluded = input$farringtonflexible_pastWeeksNotIncluded,
+      powertrans = input$farringtonflexible_powertrans,
+      range = algo_range()
+    ))
+  })
+
+  # glrnb
+  observe({
+    algorithms[["glrnb"]] <- surveillance::glrnb(time_series(), control = list(
+      "c.ARL" = input$glrnb_c_ARL,
+      ret = "cases",
+      theta = 1.2,
+      mu0 = list(S = 1, trend = input$glrnb_trend),
+      range = algo_range()
+    ))
+  })
 
   # data
   time_series <- reactive({
@@ -63,7 +72,7 @@ shinyServer(function(input, output) {
     base_data <- sts_to_df("tmp", time_series()) %>%
       distinct(epoch, observed)
     purrr::map(input$algorithms, function(algo) {
-      base_data %>% left_join(sts_to_df(algo, algorithms[[algo]]()),
+      base_data %>% left_join(sts_to_df(algo, algorithms[[algo]]),
                               by = c("epoch", "observed")) %>%
         mutate(algorithm = algo)
     }) %>% bind_rows

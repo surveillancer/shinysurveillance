@@ -18,31 +18,50 @@ ears_parameters <- function() {
 
 farringtonFlexible_parameters <- function() {
   tagList(
-    numericInput("farringtonflexible_alpha",
-                 "Alpha:",
-                 min = .Machine$double.eps,
-                 max = 1 - .Machine$double.eps,
-                 0.001),
-    numericInput("farringtonflexible_b",
-                 "b:",
-                 min = 1,
-                 max = 6,
-                 value = 3,
-                 step = 1),
-    numericInput("farringtonflexible_w",
-                 "w:",
-                 min = 1,
-                 max = 52,
-                 value = 5,
-                 step = 1)
-  )
+    shiny::fluidRow(
+      column(6, tagList(
+        numericInput("farringtonflexible_alpha",
+                             "Alpha:",
+                             min = .Machine$double.eps,
+                             max = 1 - .Machine$double.eps,
+                             0.001),
+        selectInput("farringtonflexible_powertrans",
+                    label = "powertrans: Power transformation",
+                    selected = "2/3",
+                    choices = c("2/3: skewness correction (Default)" = "2/3",
+                                "1/2: for variance stabilizing transformation" = "1/2",
+                                "none" = "none")),
+        numericInput("farringtonflexible_pastWeeksNotIncluded",
+                     label = "pastWeeksNotIncluded: Number of past weeks to ignore in the calculation:",
+                     min = 1,
+                     max = 100,
+                     value = 26,
+                     step = 1)
+      )),
+      column(6, tagList(
+        numericInput("farringtonflexible_b",
+                     "b: How many years back in time to include when forming the base counts:",
+                     min = 1,
+                     max = 6,
+                     value = 3,
+                     step = 1),
+        numericInput("farringtonflexible_w",
+                     "w: Window's half-size, i.e. number of weeks to include before and after the current week in each year:",
+                     min = 1,
+                     max = 52,
+                     value = 5,
+                     step = 1)
+        )
+      ))
+    )
 }
 
 glrnb_parameters <- function() {
   tagList(
     numericInput("glrnb_c_ARL",
                  "Threshold in the GLR test, i.e. c_gamma:",
-                 min = 0, value = 5)
+                 min = 0, value = 5),
+    checkboxInput("glrnb_trend", "Include trend:", value = TRUE)
   )
 }
 
@@ -86,7 +105,7 @@ dataset_choices <- function() {
     "Salmonella cases in Germany 2001-2014 by data of symptoms onset" = "salmAllOnset",
     "Hospitalized Salmonella cases in Germany 2004-2014" = "salmHospitalized",
     "Salmonella Newport cases in Germany 2004-2013" = "salmNewport",
-    "Salmonella Agona cases in the UK 1990-1995" = "salmonella.agona",
+    #"Salmonella Agona cases in the UK 1990-1995" = "salmonella.agona",
     "Salmonella Hadar cases in Germany 2001-2006" = "shadar",
     "Salmonella Newport cases in Germany 2004-2013" = "stsNewport"
   )
@@ -95,32 +114,28 @@ dataset_choices <- function() {
 shinyUI(fluidPage(
 
   titlePanel("Surveillance Algorithm Tuner"),
-
-  sidebarLayout(
-    sidebarPanel(
-      tabsetPanel(
+  tags$small("Test surveillance algorithms and tune the paramters."),
+    fluidRow(
+      column(8, tabsetPanel(
         tabPanel("Algorithms",
                  selectInput("algorithms", label = "Algorithm",
                              selected = c("ears", "farringtonflexible"),
                              choices = c("Ears" = "ears",
                                          "Farrington Flexible" = "farringtonflexible",
-                                         "Count Data Regression Charts" = "glrnb"),
+                                         "Negative Binomial CUSUM" = "glrnb"),
                              multiple = TRUE),
-                 numericInput("range_min", "Monitor last X weeks:", max = 52 * 2,
-                              min = 2, value = 52)
+                 numericInput("range_min", "Monitor last X weeks:", max = 52 * 4,
+                              min = 2, value = 100)
 
-                 ),
+        ),
         tabPanel("Ears", ears_parameters()),
         tabPanel("Farrington Flexible", farringtonFlexible_parameters()),
-        tabPanel("Count Data Regression Charts", glrnb_parameters())
-      ),
-      hr(),
-      selectInput("dataset", "Dataset:", selected = "salmAllOnset",
-                  choices = dataset_choices())
+        tabPanel("Negative Binomial CUSUM", glrnb_parameters())
+      )),
+      column(4, selectInput("dataset", "Dataset:", selected = "salmAllOnset",
+                            choices = dataset_choices()))
     ),
-
-    mainPanel(
-       plotly::plotlyOutput("mainPlot")
-    )
+    hr(),
+    plotly::plotlyOutput("mainPlot")
   )
-))
+)
