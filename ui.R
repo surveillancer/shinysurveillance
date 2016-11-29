@@ -14,7 +14,8 @@ ears_parameters <- function() {
                 label = "EARS Method",
                 choices = c("C1", "C2", "C3"),
                 multiple = FALSE,
-                selected = "C1")
+                selected = "C1"),
+    a("Read documentation", target = "_blank", href = "https://www.rdocumentation.org/packages/surveillance/versions/1.12.1/topics/earsC")
   )
 }
 
@@ -45,16 +46,17 @@ farringtonFlexible_parameters <- function() {
                      "b: How many years back in time to include when forming the base counts:",
                      min = 1,
                      max = 6,
-                     value = 3,
+                     value = 2,
                      step = 1),
         numericInput("farringtonflexible_w",
                      "w: Window's half-size, i.e. number of weeks to include before and after the current week in each year:",
                      min = 1,
                      max = 52,
                      value = 5,
-                     step = 1)
+                     step = 1),
+        a("Read documentation", target = "_blank", href = "https://www.rdocumentation.org/packages/surveillance/versions/1.12.1/topics/farringtonFlexible"))
         )
-      ))
+      )
     )
 }
 
@@ -72,7 +74,8 @@ glrnb_parameters <- function() {
       ),
       column(6, numericInput("glrnb_theta",
                               "Detect an increase in cases of X percent (default 20%):",
-                              min = 1, value = 20))
+                              min = 1, value = 20),
+             a("Read documentation", target = "_blank", href = "https://www.rdocumentation.org/packages/surveillance/versions/1.12.1/topics/algo.glrnb"))
     )
   )
 }
@@ -104,7 +107,7 @@ dataset_choices <- function() {
     #"Measles in the Weser-Ems region of Lower Saxony, Germany, 2001-2002" = "measles.weser",
     #"Measles in the 16 states of Germany" = "measlesDE",
     #"Measles in the Weser-Ems region of Lower Saxony, Germany, 2001-2002" = "measlesWeserEms",
-    "Meningococcal infections in France 1985-1995" = "meningo.age",
+    #"Meningococcal infections in France 1985-1995" = "meningo.age",
     #"Danish 1994-2008 all cause mortality data for six age groups" = "momo",
     "n1 'Norovirus' in 'Stadtkreis Berlin Mitte' (Germany, Berlin)" = "n1",
     "n2 'Norovirus' in 'Torgau-Oschatz' (Germany, Sachsen)" = "n2",
@@ -116,10 +119,10 @@ dataset_choices <- function() {
     "s3 'Salmonella Anatum' in Germany" = "s3",
     "Salmonella cases in Germany 2001-2014 by data of symptoms onset" = "salmAllOnset",
     "Hospitalized Salmonella cases in Germany 2004-2014" = "salmHospitalized",
-    "Salmonella Newport cases in Germany 2004-2013" = "salmNewport",
+    #"Salmonella Newport cases in Germany 2004-2013" = "salmNewport",
     #"Salmonella Agona cases in the UK 1990-1995" = "salmonella.agona",
-    "Salmonella Hadar cases in Germany 2001-2006" = "shadar",
-    "Salmonella Newport cases in Germany 2004-2013" = "stsNewport"
+    "Salmonella Hadar cases in Germany 2001-2006" = "shadar"
+    #"Salmonella Newport cases in Germany 2004-2013" = "stsNewport"
   )
 }
 
@@ -142,7 +145,7 @@ shinyUI(fluidPage(
         tabPanel("Farrington Flexible", farringtonFlexible_parameters()),
         tabPanel("Negative Binomial CUSUM", glrnb_parameters()),
         tabPanel("Dataset", selectInput("dataset", "Dataset:", selected = "salmAllOnset",
-                                        choices = dataset_choices()))
+                                        choices = dataset_choices()), p("Some datasets might require to change specific algorithm parameters."))
       ))
     ),
     hr(),
