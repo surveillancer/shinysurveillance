@@ -107,7 +107,15 @@ shinyServer(function(input, output) {
   })
 
   output$mainPlot <- plotly::renderPlotly({
-    plot_data <- surv_ts()
+    limit_data <- function(data) {
+      if (input$dataset_last_weeks > 0 &&
+          input$dataset_last_weeks <= nrow(data)) {
+        tail(dplyr::arrange(data, epoch), n = input$dataset_last_weeks)
+      } else {
+        data
+      }
+    }
+    plot_data <- limit_data(surv_ts())
     alarm_data <- plot_data %>%
       filter(alarm)
     outbreak_data <- plot_data %>%

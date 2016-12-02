@@ -145,7 +145,11 @@ shinyUI(fluidPage(
         tabPanel("Farrington Flexible", farringtonFlexible_parameters()),
         tabPanel("Negative Binomial CUSUM", glrnb_parameters()),
         tabPanel("Dataset", selectInput("dataset", "Dataset:", selected = "salmAllOnset",
-                                        choices = dataset_choices()), p("Some datasets might require to change specific algorithm parameters."))
+                                        choices = dataset_choices()),
+                 p("Some datasets might require to change specific algorithm parameters."),
+                 numericInput("dataset_last_weeks", "Show last X weeks (0 for all):",
+                              value = 0, min = 0, step = 1),
+                 p("The algorithms are still fitted on the full dataset."))
       ))
     ),
     hr(),
